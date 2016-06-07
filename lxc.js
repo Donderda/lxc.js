@@ -158,13 +158,21 @@ module.exports = function(config){
      * Wrapper for lxc-attach command
      * @param name
      * @param command
+     * @param user
      * @param cbComplete
      */
-    obj.attach = function(name, command, cbComplete) {
+    obj.attach = function(name, command, user, cbComplete) {
         var output = '';
-        sysExec('lxc-attach -n '+name+' -- '+command, function(data){output+=data}, function(error){
-            cbComplete(error, output);
-        });
+
+        if(typeof user === 'function'){
+            sysExec('lxc-attach -n '+name+' -- '+command, function(data){output+=data}, function(error){
+                cbComplete(error, output);
+            });
+        } else {
+            sysExec('lxc-attach -n '+name+' -- su - '+user+' "'+command+'"', function(data){output+=data}, function(error){
+                cbComplete(error, output);
+            });
+        }
     }
 
     obj.list = function(cb){
