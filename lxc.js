@@ -169,7 +169,7 @@ module.exports = function(config){
                 cbComplete(error, output);
             });
         } else {
-            sysExec('lxc-attach -n '+name+' -- su - '+user+' "'+command+'"', function(data){output+=data}, function(error){
+            sysExec('lxc-attach -n '+name+' -- su '+user+'  -c "'+command+'"', function(data){output+=data}, function(error){
                 cbComplete(error, output);
             });
         }
