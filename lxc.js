@@ -1,6 +1,7 @@
 module.exports = function(config){
 
     var obj = {};
+    var exec = require('child_process').exec;
     var child = require('child'),
         config = config || {},
         sshBind = config.sshBind || false;
@@ -159,20 +160,24 @@ module.exports = function(config){
      * @param name
      * @param command
      * @param user
+     * @param options: see https://nodejs.org/api/child_process.html#child_process_child_process_exec_command_options_callback
      * @param cbComplete
      */
-    obj.attach = function(name, command, user, cbComplete) {
+    obj.attach = function(name, command, user, options, cbComplete) {
         var output = '';
-
+        var cmd = "";
         if(typeof user === 'function'){
-            sysExec('lxc-attach -n '+name+' -- '+command, function(data){output+=data}, function(error){
-                cbComplete(error, output);
-            });
+            cmd = 'lxc-attach -n '+name+' -- '+command;
         } else {
-            sysExec('lxc-attach -n '+name+' -- su '+user+'  -c "'+command+'"', function(data){output+=data}, function(error){
-                cbComplete(error, output);
-            });
+            cmd = 'lxc-attach -n '+name+' -- su '+user+'  -c "'+command+'"';
         }
+        exec(cmd, options, (error, stdout, stderr) => {
+            if(error) {
+                console.error(`exec error: ${error}`);
+            }
+
+            cbComplete(error, stdout, stderr);
+        });
     }
 
     obj.list = function(cb){
