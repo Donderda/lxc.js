@@ -43,7 +43,7 @@ module.exports = function(config){
     }
 
     obj.destroy = function(name, cbComplete, cbData){
-        sysExec('lxc-destroy -n '+ name, cbComplete, cbData);
+        sysExec('lxc-destroy -s -n '+ name, cbComplete, cbData);
     }
 
 
